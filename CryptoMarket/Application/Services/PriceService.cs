@@ -43,7 +43,7 @@ namespace CryptoMarket.Application.Services
                 }
             }
 
-            if (symbolsToFetch.Any())
+            if (symbolsToFetch.Count != 0)
             {
                 var pricesFromBinance =
                     await _binanceClient.GetLatestPricesAsync(symbolsToFetch);
