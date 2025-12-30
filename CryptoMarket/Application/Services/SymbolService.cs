@@ -34,7 +34,7 @@ namespace CryptoMarket.Application.Services
 
             var symbols = await _db.Symbols.AsNoTracking().ToListAsync();
 
-            if (!symbols.Any())
+            if (symbols.Count == 0)
             {
                 await RefreshSymbolsAsync();
                 symbols = await _db.Symbols.AsNoTracking().ToListAsync();
