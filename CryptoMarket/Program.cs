@@ -18,10 +18,12 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddMemoryCache();
-builder.Services.AddHttpClient();
-builder.Services.AddScoped<ISymbolService, SymbolService>();
-builder.Services.AddScoped<IBinanceClient, BinanceClient>();
 
+builder.Services.AddHttpClient<IBinanceClient, BinanceClient>(client =>
+{
+    client.BaseAddress = new Uri("https://api.binance.com");
+});
+builder.Services.AddScoped<ISymbolService, SymbolService>();
 builder.Services.AddScoped<IPriceService, PriceService>();
 builder.Services.AddScoped<ICandleService, CandleService>();
 

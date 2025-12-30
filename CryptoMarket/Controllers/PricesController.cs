@@ -11,7 +11,7 @@ namespace CryptoMarket.Controllers
 
         public PricesController(IPriceService priceService)
         {
-            priceService = _priceService!;
+            _priceService = priceService;
         }
 
         [HttpGet]

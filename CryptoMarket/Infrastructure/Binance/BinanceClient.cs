@@ -10,19 +10,19 @@ namespace CryptoMarket.Infrastructure.Binance
     {
         private readonly HttpClient _httpClient;
         
-        private const string BaseUrl = "https://api.binance.com/api/v3";
+        // private const string BaseUrl = "https://api.binance.com/api/v3";
 
         public BinanceClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
-        }
+        } 
 
         public async Task<List<string>> GetUsdtSymbolsAsync()
-        {
+        { 
             try
             {
                 var response = await _httpClient.GetFromJsonAsync<ExchangeInfoResponse>(
-                $"{BaseUrl}/exchangeinfo");
+                "api/v3/exchangeInfo");
 
                 return response!.Symbols
                     .Where(s => s.QuoteAsset == "USDT" && s.Status == "TRADING")
@@ -42,7 +42,7 @@ namespace CryptoMarket.Infrastructure.Binance
             var tasks = symbols.Select(async symbol =>
             {
                 var priceResponse = await _httpClient.GetFromJsonAsync<PriceResponse>(
-                    $"{BaseUrl}/ticker/price?symbol={symbol}");
+                    $"/api/v3/ticker/price?symbol={symbol}");
 
                 return (symbol, decimal.Parse(priceResponse!.Price));
             });
@@ -56,8 +56,11 @@ namespace CryptoMarket.Infrastructure.Binance
         {
             
             var result = await _httpClient.GetFromJsonAsync<List<List<object>>>(
-                $"{BaseUrl}/klines?symbol={symbol}&interval={interval}&limit={limit}");
+                $"/api/v3/klines?symbol={symbol}&interval={interval}&limit={limit}");
             
+            if (result == null)
+                throw new Exception("Binance returned empty kline data.");
+
             return result!;
 
         }
