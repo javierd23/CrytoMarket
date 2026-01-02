@@ -16,7 +16,7 @@ namespace CryptoMarket.Controllers
             _candleService = candleService!;
         }
 
-        [HttpGet]
+        [HttpGet("{symbol}")]
         public async Task<IActionResult> GetCandles(
             string symbol,
             [FromQuery] string interval = "1m",
