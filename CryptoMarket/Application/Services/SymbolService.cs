@@ -48,18 +48,23 @@ namespace CryptoMarket.Application.Services
         public async Task RefreshSymbolsAsync()
         {
             var symbolsFromBinance = await _binanceClient.GetUsdtSymbolsAsync();
+            var binanceSet = symbolsFromBinance.ToHashSet();
 
-            _db.Symbols.RemoveRange(_db.Symbols);
+            var dbSymbols = await _db.Symbols.AsNoTracking().ToListAsync();
+            var dbSymbolsSet = dbSymbols.Select(s => s.Name).ToHashSet();
+
+            var symbolsToAdd = symbolsFromBinance
+                .Where(s => !dbSymbolsSet.Contains(s))
+                .Select(s => new Symbol { Name = s });
+
+            await _db.AddRangeAsync(symbolsToAdd);
+
+            var symbolsToRemove = dbSymbols
+                .Where(s => !binanceSet.Contains(s.Name!));
+
+            _db.Symbols.RemoveRange(symbolsToRemove);
+
             await _db.SaveChangesAsync();
-
-            var entities = symbolsFromBinance
-                .Select(s => new Symbol { Name = s })
-                .ToList();
-
-            await _db.Symbols.AddRangeAsync(entities);
-            await _db.SaveChangesAsync();
-
-            _cache.Remove(CacheKey);
         }
 
     }
